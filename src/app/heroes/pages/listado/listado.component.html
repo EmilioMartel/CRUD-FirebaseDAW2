@@ -7,15 +7,22 @@
      fxLayoutAlign="center"
      fxLayoutGap="10px">
 
-    <div fxFlex="15"
-         fxFlex.lg="22"
-         fxFlex.md="30"
-         fxFlex.sm="45"
-         
-         *ngFor="let heroe of heroes">
-        
-         <app-heroe-tarjeta [heroe]="heroe"></app-heroe-tarjeta>
-    </div>
 
+     <div fxFlex="15"
+          fxFlex.lg="22"
+          fxFlex.md="30"
+          fxFlex.sm="45"
+          
+          *ngFor="let heroe of heroes">
+               <app-heroe-tarjeta [heroe]="heroe"></app-heroe-tarjeta>
+     </div>
+     
 
+     <div *ngIf="heroes.length <= 0">
+          <h1>No hay heroes almacenados...</h1>
+     </div>
+     
+     
+     
+     
 </div>

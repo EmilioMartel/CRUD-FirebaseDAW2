@@ -7,6 +7,7 @@ import { Heroe } from '../../interfaces/heroes.interface';
   styles: [`
     mat-card{
       margin-top: 15px;
+      width: 250px;
     }
   `]
 })

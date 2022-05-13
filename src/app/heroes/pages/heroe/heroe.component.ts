@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from "rxjs/operators";
 
 import { Heroe } from '../../interfaces/heroes.interface';
+import { FirestoreService } from '../../services/firestore.service';
 import { HeroesService } from '../../services/heroes.service';
 
 
@@ -22,13 +23,13 @@ export class HeroeComponent implements OnInit {
   heroe!: Heroe;
 
   constructor( private activatedRoute: ActivatedRoute,
-               private heroesService: HeroesService,
+               private firestore: FirestoreService,
                private router: Router) { }
 
   ngOnInit(): void {
     this.activatedRoute.params
       .pipe(
-        switchMap( ({ id }) => this.heroesService.getHeroeById( id ) )
+        switchMap( ({ id }) => this.firestore.getHeroeById( id ) )
       )
       .subscribe( heroe => this.heroe = heroe );    
   }

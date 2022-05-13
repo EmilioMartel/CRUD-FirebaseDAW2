@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Pipe } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { HeroesService } from '../../services/heroes.service';
 import { Publisher, Heroe } from '../../interfaces/heroes.interface';
 import { ConfirmarComponent } from '../../components/confirmar/confirmar.component';
+import { FirestoreService } from '../../services/firestore.service';
 
 
 
@@ -22,6 +22,7 @@ import { ConfirmarComponent } from '../../components/confirmar/confirmar.compone
   `]
 })
 export class AgregarComponent implements OnInit {
+  isEdit: boolean = false;
 
   publishers = [
     {
@@ -35,6 +36,7 @@ export class AgregarComponent implements OnInit {
   ];
 
   heroe: Heroe = {
+    id: '',
     superhero: '',
     alter_ego: '',
     characters: '',
@@ -43,26 +45,28 @@ export class AgregarComponent implements OnInit {
     alt_img: ''
   }
 
-  constructor( private heroeService: HeroesService,
+  constructor( private firestoreService: FirestoreService,
                private activatedRoute: ActivatedRoute,
                private router: Router,
                private snackBar: MatSnackBar,
                private dialog: MatDialog) { }
 
   ngOnInit(): void {
-
     if(!this.router.url.includes('editar')){
       return;
     }   
 
     this.activatedRoute.params
       .pipe(
-        switchMap(({id}) => this.heroeService.getHeroeById(id) )
+        switchMap(({id}) => this.firestoreService.getHeroeById(id))
       )
-      .subscribe( heroe => this.heroe = heroe);
+      .subscribe( heroe => {
+        this.heroe = heroe
+        this.isEdit = true;
+      });
   }
 
-  guardar(){
+  guardar(): void{
     //campos obligatorios
     if( this.heroe.superhero.trim().length === 0 ||
         this.heroe.alter_ego.trim().length === 0 ||
@@ -72,18 +76,20 @@ export class AgregarComponent implements OnInit {
       return;
     }
     
-    if( this.heroe.id ) {
+    if( this.heroe.id?.trim().length != 0 ) {
       //Actualizar
-      this.heroeService.actualizarHeroe(this.heroe)
-        .subscribe( () => this.mostrarSnackBar( 'Registro actualizdo' ));
+      this.firestoreService.updateHero(this.heroe)
+        .then( 
+          () => this.mostrarSnackBar( 'Registro actualizdo' )
+        );
     }else {
       //Agregar
-      this.heroeService.agregarHeroe(this.heroe)
-        .subscribe( heroe => {
-         this.router.navigate(['/heroes/editar', heroe.id])
-         this.mostrarSnackBar( 'Registro creado' );
-          
-        });
+      console.log("dentro de agregar");
+      this.firestoreService.addHeroe(this.heroe);
+
+      this.router.navigate(['heroes/listado']);
+      this.mostrarSnackBar( 'Registro agregado' );
+      
     }
   }
 
@@ -97,10 +103,12 @@ export class AgregarComponent implements OnInit {
     dialog.afterClosed()
       .subscribe( (result) => {
       if( result ) {
-        this.heroeService.borrarHeroe(this.heroe.id!)
-          .subscribe( () => {
-            this.router.navigate(['/heroes'])
-          });
+        this.firestoreService.deleteHero(this.heroe.id!)
+        .then( () => {
+            this.mostrarSnackBar( 'Registro borrado' );
+            this.router.navigate(['heroes/listado']);
+          }
+        )
       }
     })
   }

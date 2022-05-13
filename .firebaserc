@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "heroes-4001d": {
+      "hosting": {
+        "heroesApp": [
+          "heroes-4001d"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "heroes-4001d"
+  }
+}

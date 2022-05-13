@@ -1,4 +1,4 @@
-<h1>{{ (heroe.id) ? 'Editar' : 'Nuevo' }} 
+<h1>{{ isEdit ? 'Editar' : 'Nuevo' }} 
     Heroe
     <small>{{ heroe.superhero }}</small> </h1>
 
@@ -70,12 +70,12 @@
                     color="primary"
                     (click)="guardar()">
                 <mat-icon>edit</mat-icon>
-                {{ (heroe.id) ? 'Actualizar' : 'Crear' }} 
+                {{ isEdit ? 'Actualizar' : 'Crear' }} 
             </button>
 
             <span class="spacer"></span>
 
-            <button *ngIf="heroe.id"
+            <button *ngIf="isEdit"
                     mat-raised-button
                     color="warn"
                     (click)="borrarHeroe()">
